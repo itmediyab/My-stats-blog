@@ -1,0 +1,83 @@
+---
+title: "messy"
+format: html
+---
+# Setup
+```{r}
+library(tidyverse)
+library(janitor)
+library(dplyr)
+library(naniar)
+library(skimr)
+```
+
+
+# Reading Data
+// not a csv file, uses delim to specify the type 
+```{r}
+MessyPenguine <- readr::read_delim("../data/Messy_Penguins.csv", delim=";") %>% 
+janitor::clean_names(case="snake")
+MessyPenguine
+```
+
+
+```{r}
+skimr::skim_without_charts("MessyPenguine")
+```
+
+# Replacing " " with NA
+```{r}
+MessyPenguine_woSpace <- MessyPenguine %>% 
+  naniar::replace_with_na_all(condition = ~.x %in% (" "))
+```
+
+```{r}
+glimpse(MessyPenguine_woSpace)
+```
+
+# Missing Data
+```{r}
+visdat::vis_dat(MessyPenguine_woSpace)
+```
+```{r}
+visdat::vis_miss(MessyPenguine_woSpace)
+```
+
+# Removing NA Rows
+```{r}
+tidyr::drop_na(MessyPenguine_woSpace)
+MessyPenguine_woSpace
+```
+
+
+# Factors
+```{r}
+MessyPenguine_factor <- MessyPenguine_modified %>%
+  mutate(
+    species = as.factor(species),
+    island = as.factor(island),
+    sex = as.factor(sex))
+dplyr::glimpse(MessyPenguine_factor)
+```
+
+```{r}
+MessyPenguine_factor <- MessyPenguine_modified %>%
+  
+```
+
+
+#Relocating
+```{r}
+MessyPenguine_relocate <- MessyPenguine_factor %>% 
+  dplyr:: relocate(where(is.factor), .after = species)
+
+glimpse(MessyPenguine_relocate)
+```
+
+# Cleaned Table
+```{r}
+MessyPenguine_relocate %>%
+  head(10) %>%
+  tinytable::tt(caption = "Messy Penguine(Clean)")
+```
+

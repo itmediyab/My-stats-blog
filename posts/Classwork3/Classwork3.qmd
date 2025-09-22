@@ -1,0 +1,193 @@
+---
+title: "Classwork3"
+format: html
+---
+
+## Setup
+```{r}
+library(tidyverse) # Sine qua non
+library(mosaic) # Out all-in-one package
+library(ggformula) # Graphing package
+library(skimr) # Looking at Data
+library(janitor) # Clean the data
+library(naniar) # Handle missing data
+library(visdat) # Visualise missing data
+library(tinytable) # Printing Static Tables for our data
+library(DT) # Interactive Tables for our data
+library(crosstable) # Multiple variable summaries
+library(ggplot2)
+```
+
+```{r}
+docVisits <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/AER/DoctorVisits.csv")
+```
+```{r}
+glimpse(docVisits)
+```
+```{r}
+docVisits_modified <- docVisits %>%
+  # Replace common NA strings and numbers with actual NA
+  naniar::replace_with_na_all(condition = ~ .x %in% common_na_strings) %>%
+  naniar::replace_with_na_all(condition = ~ .x %in% common_na_numbers) %>%
+  # Clean variable names
+  janitor::clean_names(case = "snake") %>% # clean names
+
+  # Convert character variables to factors
+  mutate(
+    gender = as_factor(gender),
+    private = as_factor(private),
+    freepoor = as_factor(freepoor),
+    freerepat = as_factor(freerepat),
+    nchronic = as_factor(nchronic),
+    lchronic = as_factor(lchronic)
+  ) %>%
+  # arrange the character variables first
+  dplyr::relocate(where(is.factor), .after = rownames)
+
+
+docVisits_modified %>% glimpse()
+```
+```{r}
+docVisits_modified %>%
+  DT::datatable(
+    caption = htmltools::tags$caption(
+      style = "caption-side: top; text-align: left; color: black; font-size: 150%;",
+      "Doctor Visits Dataset (Clean)"
+    ),
+    options = list(pageLength = 10, autoWidth = TRUE)
+  ) %>%
+  DT::formatStyle(
+    columns = names(docVisits_modified),
+    fontFamily = "Roboto Condensed",
+    fontSize = "12px"
+  )
+```
+
+## Summarising Qual Variables
+```{r}
+docVisits_modified %>% count(gender) %>% tt()
+```
+
+```{r}
+docVisits_modified %>% count(private) %>% tt()
+```
+
+```{r}
+docVisits_modified %>% count(across(.cols = c(gender,private))) %>% tt()
+```
+
+```{r}
+docVisits_modified %>% count(across(where(is.character))) %>% tt()
+```
+
+## Summarising Quant Variables
+```{r}
+docVisits_modified %>% dplyr::summarise(mean_income = mean(income, na.rm = T))
+```
+
+```{r}
+# Single Variable, Multiple Summaries
+docVisits_modified %>%
+  dplyr::summarise(
+    mean_visits = mean(visits, na.rm = T),
+    sd_visits = sd(visits, na.rm = T),
+    min_visits = min(visits, na.rm = T),
+    max_visits = max(visits, na.rm = T)
+  )
+```
+```{r}
+# library(crosstable)
+crosstable(visits + income ~ gender + freepoor,
+  data = docVisits_modified
+) %>%
+  crosstable::as_flextable()
+```
+
+
+# Graphs
+```{r}
+set.seed(1947)
+diamonds %>%
+  slice_sample(n = 150, weight_by = cut) %>%
+  gf_point(price ~ carat | clarity ,
+    colour = ~cut,
+    shape = ~cut,
+    size = 2, data = .
+  ) %>%
+  gf_labs(
+    title = "Plot Title = DIAMONDS ARE FOREVER",
+    subtitle = "Plot Subtitle = AND A GIRL'S BEST FRIEND",
+    caption = "Plot Caption = From the diamonds dataset",
+    x = "x-Axis Title = CARAT",
+    y = "y-Axis Title = PRICE"
+  ) %>%
+  # Use same name for scales to merge legends
+  gf_refine(
+    scale_color_brewer(
+      name = "Legend = DIAMOND QUALITY",
+      palette = "Set1"
+    ),
+    scale_shape_manual(
+      name = "Legend = DIAMOND QUALITY",
+      values = c(15:21)
+    )
+  ) %>%
+  gf_annotate("text",
+    x = 1.0, y = 16000,
+    label = "These DIAMONDS are\n Super Affordable!!",
+    fontface = "bold",
+    size = 2
+  ) %>%
+  gf_annotate("curve",
+    x = 0.9,
+    y = 14500,
+    yend = 8000,
+    xend = 0.95,
+    linewidth = 0.5,
+    curvature = 0.5,
+    arrow = arrow(length = unit(0.25, "cm"))
+  ) %>%
+  gf_annotate(
+    "rect",
+    xmin = 1,
+    xmax = 1.25,
+    ymin = 2250,
+    ymax = 10000,
+    alpha = 0.5,
+    fill = "grey80",
+    col = "black"
+  )
+```
+
+```{r}
+diamonds %>% gf_bar( ~ clarity | cut, fill=~clarity)
+```
+
+
+
+```{r}
+taxi <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/modeldata/taxi.csv")
+
+taxi_modified <- taxi %>%
+  naniar::replace_with_na_all(condition = ~ .x %in% common_na_strings) %>%
+  naniar::replace_with_na_all(condition = ~ .x %in% common_na_numbers) %>%
+  janitor::clean_names(case = "snake") %>%
+  janitor::remove_empty()
+
+taxi_modified
+```
+
+
+
+```{r}
+ggplot2::theme_set(new = theme_custom())
+
+taxi_modified %>%
+  gf_bar(~local,
+    position = "dodge"
+  ) %>%
+  gf_labs(title = "Plot 2A: Dodged Bar Chart") %>%
+  gf_refine(scale_fill_brewer(palette = "Set1"))
+```
+
+

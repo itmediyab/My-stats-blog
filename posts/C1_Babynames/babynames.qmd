@@ -1,0 +1,63 @@
+---
+title: "Classwork1"
+format: html
+editor: visual
+---
+
+## This is my first quarto document
+
+### Calling Libraries
+
+```{r}
+library(tidyverse)
+library(babynames)
+library(ggformula)
+```
+
+```{r}
+babynames
+```
+
+### Filtering baby names
+
+```{r}
+babynames %>% filter(name=="Diya")
+```
+
+#### Area data plotting
+
+```{r}
+babynames %>% filter(name == "Diya" | name == "Dia" | name == "Deeya") %>%
+  gf_area(n ~ year, color = ~ name) %>% 
+  gf_labs(title = "Number of babies named Diya or Dia or Diyaa in the USA",
+         x = "Year",
+         y = "Number of babies") %>% gf_theme(theme_light())
+```
+
+#### Point data plotting
+
+```{r}
+babynames %>% filter(name == "Diya" | name == "Dia" | name == "Deeya") %>%
+  gf_point(n ~ year, color = ~ name) %>% 
+  gf_labs(title = "Number of babies named Diya or Dia or Diyaa in the USA",
+         x = "Year",
+         y = "Number of babies") %>% gf_theme(theme_light())
+```
+
+#### Bar data plotting
+
+```{r}
+babynames %>% filter(name == "Diya" | name == "Dia" | name == "Deeya") %>%
+  gf_bar(n ~ year, color = ~ name) %>% 
+  gf_labs(title = "Number of babies named Diya or Dia or Diyaa in the USA",
+         x = "Year",
+         y = "Number of babies") %>% gf_theme(theme_light())
+```
+
+```{r}
+babynames %>% filter(name == "Diya" | name == "Dia" | name == "Deeya") %>% filter(year == "1989" | year == "2010") %>%
+  gf_point(n ~ year, color = ~ name) %>% 
+  gf_labs(title = "Number of babies named Diya or Dia or Diyaa in the USA",
+         x = "Year",
+         y = "Number of babies") %>% gf_theme(theme_light())
+```

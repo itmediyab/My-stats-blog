@@ -1,0 +1,126 @@
+---
+title: "Classwork2"
+author: "Diya Bijoy"
+format: html
+---
+
+## Setup R packages
+
+```{r}
+#| label: setup
+#| echo: false
+library(tidyverse)
+library(mosaic)
+library(skimr) 
+library(visdat) 
+library(naniar) 
+library(janitor)
+library(tinytable)
+library(ggplot2)
+```
+
+## Reading csv file
+
+```{r}
+fastfood <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/openintro/fastfood.csv") %>% 
+clean_names(case="snake")
+fastfood
+```
+
+## Names function
+
+```{r}
+names(fastfood)
+```
+
+## Glimpse, Dim, str
+
+```{r}
+dplyr::glimpse(fastfood)
+```
+
+```{r}
+base::dim(fastfood)
+```
+
+```{r}
+utils::str(fastfood)
+```
+
+## Finding Missing values
+
+```{r}
+visdat::vis_dat(fastfood) +
+  labs(title = "Missing Data", subtitle = "Showing variable types") + 
+  theme(plot.title = element_text(size = 20), plot.subtitle = element_text(size = 14))
+```
+
+```{r}
+vis_miss(fastfood) +
+  labs(title ="Missing Data in the FastFood Dataset", subtitle = "Showing missing & present data") +
+  theme(plot.title = element_text(size = 20), plot.subtitle = element_text(size = 14))
+```
+
+## Removing missing data
+
+```{r}
+fastfood_modified <- fastfood %>% tidyr::drop_na()
+```
+
+## Displaying modified data table
+
+```{r}
+fastfood_modified
+```
+
+## Removing the column entirely
+
+```{r}
+fastfood_modified2 <- fastfood %>%
+  dplyr::select(-vit_a)
+
+fastfood_modified2 <- fastfood %>%
+  dplyr::select(-c(vit_a, vit_c))
+```
+
+## Converting into Factors
+
+```{r}
+fastfood_modified1 <- fastfood %>%
+  mutate(
+    restaurant = as.factor(restaurant),
+    salad = as.factor(salad),
+    item = as.factor(item))
+dplyr::glimpse(fastfood_modified1)
+```
+
+## Relocate
+
+```{r}
+fast_food_modified <- fastfood_modified %>%
+  mutate(
+    restaurant = as.factor(restaurant),
+    salad = as.factor(salad),
+    item = as.factor(item)
+  ) %>%
+  rename("dish" = item) %>% # rename item to dish
+
+  # arrange the Qual variables first, Quant next
+  dplyr::relocate(where(is.factor), .after = rownames)
+
+glimpse(fast_food_modified)
+```
+
+## Displaying Data
+
+```{r}
+fast_food_modified %>%
+  head(10) %>%
+  tinytable::tt(caption = "Fast Food Dataset (Clean)")
+```
+
+```{r}
+fast_food_modified %>%
+  gf_bar(calories ~ dish, color = dish)
+```
+
