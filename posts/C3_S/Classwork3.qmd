@@ -180,8 +180,6 @@ taxi_modified
 
 
 ```{r}
-ggplot2::theme_set(new = theme_custom())
-
 taxi_modified %>%
   gf_bar(~local,
     position = "dodge"
