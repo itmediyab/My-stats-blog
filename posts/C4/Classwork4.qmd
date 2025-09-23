@@ -1,0 +1,123 @@
+---
+title: "Classwork4"
+format: html
+---
+
+# Setup
+```{r}
+library(tidyverse) # Sine qua non
+library(mosaic) # Out all-in-one package
+library(ggformula) # Graphing package
+library(skimr) # Looking at Data
+library(janitor) # Clean the data
+library(naniar) # Handle missing data
+library(visdat) # Visualise missing data
+library(tinytable) # Printing Static Tables for our data
+library(DT) # Interactive Tables for our data
+library(crosstable) # Multiple variable summaries
+```
+
+# Reading csv file
+```{r}
+taxi <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/modeldata/taxi.csv")
+
+taxi_modified <- taxi %>%
+  naniar::replace_with_na_all(condition = ~ .x %in% common_na_strings) %>%
+  naniar::replace_with_na_all(condition = ~ .x %in% common_na_numbers) %>%
+  janitor::clean_names(case = "snake") %>%
+  janitor::remove_empty()
+
+taxi_modified
+```
+
+# Theme chosing
+```{r}
+RColorBrewer::display.brewer.all()
+```
+
+
+# Data Munging 
+```{r}
+## Convert `dow`, `local`, `month`, and `hour` into ordered factors
+taxi_modified <- taxi_modified %>%
+  dplyr::mutate(
+
+    ## Variable "tip"
+    tip = base::factor(tip,
+      levels = c("yes", "no"),
+      labels = c("yes", "no"),
+      ordered = TRUE
+    ),
+
+    ## Variable "company"
+    company = base::factor(company), # Any order is OK.
+
+    ## Variable "dow"
+    dow = base::factor(dow,
+      levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+      labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+      ordered = TRUE
+    ),
+
+    ## Variable "local"
+    local = base::factor(local,
+      levels = c("yes", "no"),
+      labels = c("yes", "no"),
+      ordered = TRUE
+    ),
+
+    ## Variable "month"
+    month = base::factor(month,
+      levels = c("Jan", "Feb", "Mar", "Apr"),
+      labels = c("Jan", "Feb", "Mar", "Apr"),
+      ordered = TRUE
+    ),
+
+    ## Variable "hour"
+    hour = base::factor(hour,
+      levels = c(0:23), labels = c(0:23),
+      ordered = TRUE
+    )
+  ) %>%
+  dplyr::relocate(where(is.factor), .after = rownames) # Move all factors to the left
+
+taxi_modified %>% glimpse()
+```
+# Position dodge
+```{r}
+taxi_modified %>%
+  gf_bar(~local,
+    fill = ~tip,
+    position = "dodge"
+  ) %>%
+  gf_labs(title = "Plot 2A: Dodged Bar Chart") %>%
+  gf_refine(scale_fill_brewer(palette = "Set1"))
+```
+# Position stack
+```{r}
+taxi_modified %>%
+  gf_bar(~local,
+    fill = ~tip,
+    position = "stack"
+  ) %>%
+  gf_labs(
+    title = "Plot 2B: Stacked Bar Chart",
+    subtitle = "Can we spot per group differences in proportions??"
+  ) %>%
+  gf_refine(scale_fill_brewer(palette = "Set1"))
+```
+# Position fill
+```{r}
+taxi_modified %>%
+  gf_bar(~local,
+    fill = ~tip,
+    position = "fill"
+  ) %>%
+  gf_labs(
+    title = "Plot 2C: Filled Bar Chart",
+    subtitle = "Shows Per group differences in Proportions!"
+  ) %>%
+  gf_refine(scale_fill_brewer(palette = "Set1"))
+```
+
+

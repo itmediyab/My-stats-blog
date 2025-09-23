@@ -4,6 +4,7 @@ format: html
 ---
 
 ## Setup
+
 ```{r}
 library(tidyverse) # Sine qua non
 library(mosaic) # Out all-in-one package
@@ -21,9 +22,11 @@ library(ggplot2)
 ```{r}
 docVisits <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/AER/DoctorVisits.csv")
 ```
+
 ```{r}
 glimpse(docVisits)
 ```
+
 ```{r}
 docVisits_modified <- docVisits %>%
   # Replace common NA strings and numbers with actual NA
@@ -47,6 +50,7 @@ docVisits_modified <- docVisits %>%
 
 docVisits_modified %>% glimpse()
 ```
+
 ```{r}
 docVisits_modified %>%
   DT::datatable(
@@ -64,6 +68,7 @@ docVisits_modified %>%
 ```
 
 ## Summarising Qual Variables
+
 ```{r}
 docVisits_modified %>% count(gender) %>% tt()
 ```
@@ -81,12 +86,14 @@ docVisits_modified %>% count(across(where(is.character))) %>% tt()
 ```
 
 ## Summarising Quant Variables
+
 ```{r}
 docVisits_modified %>% dplyr::summarise(mean_income = mean(income, na.rm = T))
 ```
 
+### Single Variable, Multiple Summaries
+
 ```{r}
-# Single Variable, Multiple Summaries
 docVisits_modified %>%
   dplyr::summarise(
     mean_visits = mean(visits, na.rm = T),
@@ -95,8 +102,59 @@ docVisits_modified %>%
     max_visits = max(visits, na.rm = T)
   )
 ```
+
+### Multiple Variables, Multiple Summaries
+
 ```{r}
-# library(crosstable)
+docVisits_modified %>%
+  dplyr::summarise(across(.cols = c(visits, income), # select columns
+
+    .fns = list(
+      mean = ~ mean(., na.rm = T),
+      sd = sd,
+      min = min, max = max
+    )
+  ))
+```
+
+### Grouped Summaries
+
+#### One qual variable
+
+```{r}
+docVisits_modified %>%
+  group_by(gender) %>%
+  summarize(average_visits = mean(visits), count = n())
+```
+
+#### Two qual variable
+
+```{r}
+docVisits_modified %>%
+  group_by(age, gender) %>%
+  summarize(average_visits = mean(visits), 
+            max_visits = max(visits),
+            min_visits = min(visits),count = n())
+```
+
+#### Multiple Variables, Multiple Summaries
+```{r}
+docVisits_modified %>%
+  dplyr::summarise(across(
+    .cols = c(visits, income),
+
+    .fns = list(
+      mean = ~ mean(., na.rm = T),
+      sd = sd,
+      min = min, max = max
+    )
+  ))
+```
+
+
+#### Cross Table
+
+```{r}
 crosstable(visits + income ~ gender + freepoor,
   data = docVisits_modified
 ) %>%
@@ -104,12 +162,27 @@ crosstable(visits + income ~ gender + freepoor,
 ```
 
 
+##### Using Qualitative variables
+
+```{r}
+crosstable(freerepat + private ~ gender + freepoor,
+  data = docVisits_modified
+) %>%
+  crosstable::as_flextable()
+```
+
+
+```{r}
+glimpse(docVisits_modified)
+```
+
 # Graphs
+
 ```{r}
 set.seed(1947)
 diamonds %>%
   slice_sample(n = 150, weight_by = cut) %>%
-  gf_point(price ~ carat | clarity ,
+  gf_point(price ~ carat,
     colour = ~cut,
     shape = ~cut,
     size = 2, data = .
@@ -160,10 +233,12 @@ diamonds %>%
 ```
 
 ```{r}
-diamonds %>% gf_bar( ~ clarity | cut, fill=~clarity)
+diamonds %>% gf_bar( ~ clarity | depth, fill=~clarity)
 ```
 
-
+```{r}
+glimpse(diamonds)
+```
 
 ```{r}
 taxi <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/modeldata/taxi.csv")
@@ -177,8 +252,6 @@ taxi_modified <- taxi %>%
 taxi_modified
 ```
 
-
-
 ```{r}
 taxi_modified %>%
   gf_bar(~local,
@@ -187,5 +260,3 @@ taxi_modified %>%
   gf_labs(title = "Plot 2A: Dodged Bar Chart") %>%
   gf_refine(scale_fill_brewer(palette = "Set1"))
 ```
-
-
