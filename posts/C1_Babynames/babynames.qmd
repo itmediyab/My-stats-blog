@@ -2,7 +2,7 @@
 title: "Classwork 1"
 author: "Diya Bijoy"
 date: "2025-09-15"
-categories: [Babynames] [Filtering]
+categories: [Babynames, Filtering]
 ---
 
 ## This is my first quarto document
