@@ -121,3 +121,75 @@ taxi_modified %>%
 ```
 
 
+# Histogram
+```{r}
+data("diamonds", package = "ggplot2")
+glimpse(diamonds)
+```
+```{r}
+diamonds_modified <- diamonds %>%
+  janitor::clean_names(case = "snake") %>%
+  janitor::remove_empty(which = c("rows", "cols")) # Empty columns and rows if any
+diamonds_modified %>% glimpse()
+```
+
+```{r}
+gf_histogram(~price, data = diamonds_modified, fill=~cut, color="black") %>%
+  gf_labs(
+    title = "Plot 1A: Diamond Prices",
+    caption = "ggformula"
+  ) %>% 
+  gf_refine(scale_fill_brewer(palette = "Set1"))
+```
+
+
+```{r}
+gf_histogram(~price | cut, data = diamonds_modified, fill=~cut, color="black") %>%
+  gf_labs(
+    title = "Plot 1A: Diamond Prices",
+    caption = "ggformula"
+  ) %>% 
+  gf_refine(scale_fill_brewer(palette = "Set8"))
+```
+```{r}
+gf_histogram(~price | color, data = diamonds_modified, fill=~color, color="black") %>%
+  gf_labs(
+    title = "Plot 1A: Diamond Prices",
+    caption = "ggformula"
+  ) %>% 
+  gf_refine(scale_fill_brewer(palette = "Set1"))
+```
+
+
+```{r}
+glimpse(diamonds_modified)
+```
+
+```{r}
+diamonds_modified %>%
+  gf_boxplot(cut ~ carat | clarity, orientation = "y") %>%
+  gf_labs(y = "Gender", x = "Income", title = "Plot 2A: Income by Gender")
+```
+
+```{r}
+diamonds_modified %>%
+  gf_boxplot(clarity ~ depth, orientation = "y") %>%
+  gf_labs(y = "Gender", x = "Income", title = "Plot 2A: Income by Gender")
+```
+
+```{r}
+diamonds_modified %>%
+  gf_boxplot(color ~ price, orientation = "y", fill = "pink", color = "black") %>%
+  gf_labs(y = "Gender", x = "Income", title = "Plot 2A: Income by Gender")
+```
+```{r}
+diamonds_modified %>%
+  gf_boxplot(clarity ~ price, orientation = "y") %>%
+  gf_labs(y = "Clarity", x = "Price", title = "Plot 2A: Income by Gender")
+```
+```{r}
+diamonds_modified %>%
+  gf_boxplot(cut ~ carat, orientation = "y") %>%
+  gf_labs(y = "Clarity", x = "Price", title = "Plot 2A: Income by Gender")
+```
+

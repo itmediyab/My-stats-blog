@@ -119,8 +119,3 @@ fast_food_modified %>%
   tinytable::tt(caption = "Fast Food Dataset (Clean)")
 ```
 
-```{r}
-fast_food_modified %>%
-  gf_bar(calories ~ dish, color = dish)
-```
-

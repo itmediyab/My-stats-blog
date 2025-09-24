@@ -29,9 +29,6 @@ skimr::skim_without_charts("MessyPenguine")
 ```{r}
 MessyPenguine_woSpace <- MessyPenguine %>% 
   naniar::replace_with_na_all(condition = ~.x %in% (" "))
-```
-
-```{r}
 glimpse(MessyPenguine_woSpace)
 ```
 
@@ -39,6 +36,7 @@ glimpse(MessyPenguine_woSpace)
 ```{r}
 visdat::vis_dat(MessyPenguine_woSpace)
 ```
+
 ```{r}
 visdat::vis_miss(MessyPenguine_woSpace)
 ```
@@ -52,7 +50,7 @@ MessyPenguine_woSpace
 
 # Factors
 ```{r}
-MessyPenguine_factor <- MessyPenguine_modified %>%
+MessyPenguine_factor <- MessyPenguine_woSpace %>%
   mutate(
     species = as.factor(species),
     island = as.factor(island),
@@ -61,22 +59,14 @@ dplyr::glimpse(MessyPenguine_factor)
 ```
 
 ```{r}
-MessyPenguine_factor <- MessyPenguine_modified %>%
-  
-```
-
-
-#Relocating
-```{r}
-MessyPenguine_relocate <- MessyPenguine_factor %>% 
-  dplyr:: relocate(where(is.factor), .after = species)
-
-glimpse(MessyPenguine_relocate)
+MessyPenguine_relocated <- MessyPenguine_factor %>% 
+  relocate(where(is.factor), .after= species)
+glimpse(MessyPenguine_relocated)
 ```
 
 # Cleaned Table
 ```{r}
-MessyPenguine_relocate %>%
+MessyPenguine_relocated  %>%
   head(10) %>%
   tinytable::tt(caption = "Messy Penguine(Clean)")
 ```

@@ -1,0 +1,47 @@
+---
+title: "Fertility Dataset"
+format: html
+author: "Diya Bijoy"
+categories: [Fertility Dataset]
+---
+# Setup
+```{r}
+library(tidyverse)
+library(janitor)
+library(dplyr)
+library(naniar)
+library(skimr)
+```
+
+# Reading Data
+```{r}
+Fertility <- readr::read_csv("Fertility.csv") %>% 
+janitor::clean_names(case="snake")
+Fertility
+```
+
+```{r}
+tidyr::drop_na(Fertility)
+Fertility
+```
+
+```{r}
+Fertility_factor <- Fertility %>%
+  mutate(across(where(is.character), as.factor))
+dplyr::glimpse(Fertility_factor)
+```
+```{r}
+Fertility_relocated <- Fertility_factor %>%
+dplyr:: relocate(where(is.factor), .after = rownames)
+dplyr::glimpse(Fertility_relocated)
+```
+```{r}
+Fertility_relocated %>%
+  head(10) %>%
+  tinytable::tt(caption = "Fertility(Clean)")
+```
+```{r}
+Fertility_filtered <- Fertility_relocated %>% filter(afam=="yes" | hispanic=="yes" | other== "yes")
+Fertility_filtered
+```
+
